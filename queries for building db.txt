@@ -1,0 +1,130 @@
+--create tables
+CREATE SCHEMA `tennisdb` ;
+
+CREATE TABLE `tennisdb`.`player` (
+  `player_id` INT NOT NULL,
+  `first_name` VARCHAR(20) NOT NULL,
+  `last_name` VARCHAR(20) NOT NULL,
+  `hand` CHAR(6) NULL,
+  `hight` INT NOT NULL,
+  `nationality` VARCHAR(15) NOT NULL,
+  `birthday` DATE NULL,
+  PRIMARY KEY (`player_id`));
+
+CREATE TABLE `tennisdb`.`ranking` (
+  `player_id` INT NOT NULL,
+  `ranking_date` DATE NOT NULL,
+  `rank` INT NOT NULL,
+  PRIMARY KEY (`player_id`, `ranking_date`));
+
+CREATE TABLE `tennisdb`.`matches` (
+  `match_id` INT NOT NULL,
+  `player_1` INT NOT NULL,
+  `player_2` INT NOT NULL,
+  `score` INT NOT NULL,
+  `surface` VARCHAR(6) NULL,
+  `winner_id` INT NOT NULL,
+  PRIMARY KEY (`match_id`));
+
+CREATE TABLE `tennisdb`.`comments` (
+  `comment_id` INT NOT NULL,
+  `comment` VARCHAR(30) NOT NULL,
+  `match_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  PRIMARY KEY (`comment_id`));
+
+CREATE TABLE `tennisdb`.`user` (
+  `user_id` INT NOT NULL,
+  `user_name` VARCHAR(20) NOT NULL,
+  `country` CHAR(15) NULL,
+  `age` INT NULL,
+  `favorit_player` INT NULL,
+  `phone_number` CHAR(10) NULL,
+  `password` VARCHAR(10) NOT NULL,
+  PRIMARY KEY (`user_id`));
+
+--foregin key
+
+ALTER TABLE `tennisdb`.`user` 
+ADD INDEX `favorite_player_idx` (`favorit_player` ASC) VISIBLE;
+;
+ALTER TABLE `tennisdb`.`user` 
+ADD CONSTRAINT `favorite_player`
+  FOREIGN KEY (`favorit_player`)
+  REFERENCES `tennisdb`.`player` (`player_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `tennisdb`.`ranking` 
+ADD CONSTRAINT `player_id`
+  FOREIGN KEY (`player_id`)
+  REFERENCES `tennisdb`.`player` (`player_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `tennisdb`.`user` 
+DROP FOREIGN KEY `favorite_player`;
+ALTER TABLE `tennisdb`.`user` 
+CHANGE COLUMN `favorit_player` `favorite_player` INT NULL DEFAULT NULL ;
+ALTER TABLE `tennisdb`.`user` 
+ADD CONSTRAINT `favorite_player`
+  FOREIGN KEY (`favorite_player`)
+  REFERENCES `tennisdb`.`player` (`player_id`);
+
+ALTER TABLE `tennisdb`.`matches` 
+ADD INDEX `player1_idx` (`player_1` ASC) VISIBLE;
+;
+ALTER TABLE `tennisdb`.`matches` 
+ADD CONSTRAINT `player_1`
+  FOREIGN KEY (`player_1`)
+  REFERENCES `tennisdb`.`player` (`player_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `tennisdb`.`matches` 
+ADD INDEX `player_2_idx` (`player_2` ASC) VISIBLE;
+;
+ALTER TABLE `tennisdb`.`matches` 
+ADD CONSTRAINT `player_2`
+  FOREIGN KEY (`player_2`)
+  REFERENCES `tennisdb`.`player` (`player_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `tennisdb`.`matches` 
+ADD INDEX `winner_id_idx` (`winner_id` ASC) VISIBLE;
+;
+ALTER TABLE `tennisdb`.`matches` 
+ADD CONSTRAINT `winner_id`
+  FOREIGN KEY (`winner_id`)
+  REFERENCES `tennisdb`.`player` (`player_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `tennisdb`.`comments` 
+ADD INDEX `match_id_idx` (`match_id` ASC) VISIBLE;
+;
+ALTER TABLE `tennisdb`.`comments` 
+ADD CONSTRAINT `match_id`
+  FOREIGN KEY (`match_id`)
+  REFERENCES `tennisdb`.`matches` (`match_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `tennisdb`.`comments` 
+ADD INDEX `user_id_idx` (`user_id` ASC) VISIBLE;
+;
+ALTER TABLE `tennisdb`.`comments` 
+ADD CONSTRAINT `user_id`
+  FOREIGN KEY (`user_id`)
+  REFERENCES `tennisdb`.`user` (`user_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+--changes
+
+ALTER TABLE `tennisdb`.`ranking` 
+DROP COLUMN `ranking_date`,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`player_id`);
+;
